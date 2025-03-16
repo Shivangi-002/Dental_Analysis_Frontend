@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [lesionImage, setLesionImage] = useState(null);
+    const [restorationImage, setRestorationImage] = useState(null);
+    const [implantImage, setImplantImage] = useState(null);
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            alert("Please select an image first!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/upload/", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            // Update image sources
+            setLesionImage(`http://127.0.0.1:8000${data.lesion_image}`);
+            setRestorationImage(`http://127.0.0.1:8000${data.restoration_image}`);
+            setImplantImage(`http://127.0.0.1:8000${data.implant_image}`);
+        } catch (error) {
+            console.error("Error uploading image", error);
+        }
+    };
+
+    return (
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h2>Dental X-ray Analysis</h2>
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload}>Upload & Analyze</button>
+
+            {lesionImage && <img src={lesionImage} alt="Lesion Analysis" style={{ width: "300px" }} />}
+            {restorationImage && <img src={restorationImage} alt="Restoration Analysis" style={{ width: "300px" }} />}
+            {implantImage && <img src={implantImage} alt="Implant Analysis" style={{ width: "300px" }} />}
+        </div>
+    );
+};
 
 export default App;
