@@ -5,6 +5,7 @@ const App = () => {
     const [lesionImage, setLesionImage] = useState(null);
     const [restorationImage, setRestorationImage] = useState(null);
     const [implantImage, setImplantImage] = useState(null);
+    const API_URL = "https://dental-analysis-backend.onrender.com";
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
@@ -20,7 +21,7 @@ const App = () => {
         formData.append("file", selectedFile);
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/upload/", {
+            const response = await fetch(`${API_URL}/upload/`, {
                 method: "POST",
                 body: formData,
             });
@@ -28,9 +29,9 @@ const App = () => {
             const data = await response.json();
 
             // Update image sources
-            setLesionImage(`http://127.0.0.1:8000${data.lesion_image}`);
-            setRestorationImage(`http://127.0.0.1:8000${data.restoration_image}`);
-            setImplantImage(`http://127.0.0.1:8000${data.implant_image}`);
+            setLesionImage(`${API_URL}${data.lesion_image}`);
+            setRestorationImage(`${API_URL}${data.restoration_image}`);
+            setImplantImage(`${API_URL}${data.implant_image}`);
         } catch (error) {
             console.error("Error uploading image", error);
         }
